@@ -49,3 +49,21 @@ app.get('/products', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Search products by name
+// [GET] http://localhost:3001/products/search?title=Kiwi
+app.get('/products/search', async (req, res) => {
+  try {
+    const query = req.query;
+    if (!Object.keys(query)) {
+      return res.status(400).json({ error: 'Search query is required' });
+    }
+    const products = await fetchData();
+    const filteredProducts = products.products.filter((product) =>
+      product.title.toLowerCase().includes(query?.title?.toLowerCase())
+    );
+    res.json(filteredProducts);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});

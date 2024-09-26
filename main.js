@@ -18,4 +18,23 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Data retrieval and caching
+async function fetchData() {
+  try {
+    const cacheStats = await fs.stat(CACHE_FILE).catch(() => null);
+    if (
+      cacheStats &&
+      Date.now() - cacheStats.mtime.getTime() < CACHE_DURATION
+    ) {
+      return JSON.parse(await fs.readFile(CACHE_FILE, 'utf8'));
+    }
 
+    const response = await axios.get('https://dummyjson.com/products');
+    const data = response.data;
+    await fs.writeFile(CACHE_FILE, JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('Error fetching or caching data:', error);
+    throw error;
+  }
+}

@@ -38,3 +38,14 @@ async function fetchData() {
     throw error;
   }
 }
+
+// List all products
+// [GET] http://localhost:3001/products
+app.get('/products', async (req, res) => {
+  try {
+    const products = await fetchData();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});

@@ -67,3 +67,33 @@ app.get('/products/search', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Filter products by category and price range
+// [GET] http://localhost:3001/products/filter?category=beauty&minPrice=1&maxPrice=20
+app.get('/products/filter', async (req, res) => {
+  try {
+    const products = await fetchData();
+    let filteredProducts = products.products;
+
+    if (req.query.category) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.category === req.query.category
+      );
+    }
+    if (req.query.minPrice) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price >= parseFloat(req.query.minPrice)
+      );
+    }
+    if (req.query.maxPrice) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price <= parseFloat(req.query.maxPrice)
+      );
+    }
+
+    res.json(filteredProducts);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+

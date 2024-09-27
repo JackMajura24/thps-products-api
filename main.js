@@ -124,3 +124,18 @@ app.get('/products/sort', async (req, res) => {
   }
 });
 
+// Get product details by ID
+// [GET] http://localhost:3001/products/12
+app.get('/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const products = await fetchData();
+    const product = products.products.find((p) => p.id === parseInt(id));
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});

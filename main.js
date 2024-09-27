@@ -139,3 +139,28 @@ app.get('/products/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Update product price
+app.patch('/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price } = req.body;
+    if (typeof price !== 'number' || price < 0) {
+      return res.status(400).json({ error: 'Invalid price' });
+    }
+
+    const products = await fetchData();
+    const productIndex = products.products.findIndex(
+      (p) => p.id === parseInt(id)
+    );
+    if (productIndex === -1) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    products[productIndex].price = price;
+    await fs.writeFile(CACHE_FILE, JSON.stringify(products));
+    res.json(products[productIndex]);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});

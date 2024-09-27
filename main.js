@@ -164,3 +164,38 @@ app.patch('/products/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Complex query
+app.get('/products/complex-query', async (req, res) => {
+  try {
+    const { query, category, sortBy, order } = req.query;
+    let products = await fetchData();
+
+    if (query) {
+      products = products.products.filter((product) =>
+        product.title.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    if (category) {
+      products = products.filter((product) => product.category === category);
+    }
+
+    if (sortBy && ['price', 'title'].includes(sortBy)) {
+      products.sort((a, b) => {
+        if (order === 'desc') {
+          return b[sortBy] > a[sortBy] ? 1 : -1;
+        }
+        return a[sortBy] > b[sortBy] ? 1 : -1;
+      });
+    }
+
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

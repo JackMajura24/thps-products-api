@@ -97,3 +97,30 @@ app.get('/products/filter', async (req, res) => {
   }
 });
 
+// Sort products
+// [GET] http://localhost:3001/products/sort?field=title&order=asc
+app.get('/products/sort', async (req, res) => {
+  try {
+    // const { field, order } = req.query;
+    if (!req.query.field || !['price', 'title'].includes(req.query.field)) {
+      return res.status(400).json({ error: 'Invalid sort field' });
+    }
+    if (!req.query.order || !['asc', 'desc'].includes(req.query.order)) {
+      return res.status(400).json({ error: 'Invalid sort order' });
+    }
+
+    const products = await fetchData();
+    const sortedProducts = [...products.products].sort((a, b) => {
+      if (req.query.order === 'asc') {
+        return a[req.query.field] > b[req.query.field] ? 1 : -1;
+      } else {
+        return a[req.query.field] < b[req.query.field] ? 1 : -1;
+      }
+    });
+
+    res.json(sortedProducts);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
